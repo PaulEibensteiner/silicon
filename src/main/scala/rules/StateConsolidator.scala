@@ -19,7 +19,7 @@ import viper.silicon.state.terms.predef.`?r`
 import viper.silicon.supporters.functions.FunctionRecorder
 import viper.silicon.verifier.Verifier
 import viper.silver.ast
-import viper.silver.testing.BenchmarkStatCollector
+// import viper.silver.testing.BenchmarkStatCollector
 
 trait StateConsolidationRules extends SymbolicExecutionRules {
   def consolidate(s: State, v: Verifier): State
@@ -161,8 +161,8 @@ class DefaultStateConsolidator(protected val config: Config) extends StateConsol
 
     val initial = (fr, destChunks, Seq[NonQuantifiedChunk](), InsertionOrderedSet[Term]())
 
-    if (countForStats)
-      BenchmarkStatCollector.addToStat("SCcomps", newChunks.length)
+    // if (countForStats)
+      // BenchmarkStatCollector.addToStat("SCcomps", newChunks.length)
     val result = newChunks.foldLeft(initial) { case ((fr1, accMergedChunks, accNewChunks, accSnapEqs), nextChunk) =>
       /* accMergedChunks: already merged chunks
        * accNewChunks: newly added chunks
