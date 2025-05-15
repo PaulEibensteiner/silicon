@@ -88,7 +88,7 @@ class PortableSiliconTests extends SilSuite with StatisticalTestSuite {
     "--timeout=600" /* timeout in seconds */
   ) ++ (if (System.getProperty(randomizePropertyName, "false").toBoolean) Seq("--proverRandomizeSeeds") else Seq.empty)
 
-  val randomization: Option[(Seq[String], String, Int => Int)] = {
+  override val randomization: Option[(Seq[String], String, Int => Int)] = {
     Some(commandLineArguments , "--proverSpecificRandomSeed", i => i)
   }
 
