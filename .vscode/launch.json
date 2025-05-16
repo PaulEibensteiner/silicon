@@ -1,0 +1,59 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "scala",
+            "request": "launch",
+            "name": "Silicon Configurable Tests",
+            "testClass": "viper.silicon.ConfigurableSiliconTests",
+            // "mainClass": "org.scalatest.tools.Runner",
+            //"env": {
+            //    "JAVA_TOOL_OPTIONS": "-DSILICON_CONFIG_FILE=${input:siliconConfigFile}"
+            //},
+            // "args": [
+            //     "-o",
+            //     "-s", "viper.silicon.ConfigurableSiliconTests"
+            // ],
+            // "buildTarget": "silicon",
+            "jvmOptions": [
+                "-Xss128m",
+                "-DSILICON_CONFIG_FILE=${input:siliconConfigFile}",
+                "-DSILICON_LOG_PATH=/home/paul/master-thesis/msc-peibensteine/tryout-results/SE-PC-check-temp/0-silicon.log"
+            ],
+        },
+        {
+            "type": "scala",
+            "request": "launch",
+            "name": "Silicon Run",
+            "mainClass": "viper.silicon.SiliconRunner",
+            "buildTarget": "silicon",
+            "args": [
+                "--ideModeAdvanced",
+                "--logConfig", "/home/paul/master-thesis/msc-peibensteine/backend-configs/silicon/minimal_logger_config.json",
+                "${input:viperFile}"
+            ],
+        }
+    ],
+    "inputs": [
+        {
+            "id": "viperFile",
+            "type": "command",
+            "command": "extension.commandvariable.file.pickFile",
+            "args": {
+                "include": "tryout-targets/**/*.vpr",
+                "description": "Select viper file",
+                "fromWorkspace": "msc-peibensteine",
+            }
+        },
+        {
+            "id": "siliconConfigFile",
+            "type": "command",
+            "command": "extension.commandvariable.file.pickFile",
+            "args": {
+                "include": "backend-configs/silicon/*.json",
+                "fromWorkspace": "msc-peibensteine",
+                "description": "Select the backend config file"
+            }
+        }
+    ]
+}
