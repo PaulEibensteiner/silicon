@@ -22,6 +22,8 @@ class ConfigurableSiliconTests extends SilSuite {
 
     // The only system property - path to the config file
     private val configFilePathProperty = "SILICON_CONFIG_FILE"
+
+    private val rootPathProperty = "ROOT_DIR"
     
     // Default configuration values - all in one place for easy overview
     private object Defaults {
@@ -43,12 +45,29 @@ class ConfigurableSiliconTests extends SilSuite {
     }
     
     // Config structure parsed from JSON
+    private lazy val rootPath: Path = {
+        info(s"Root path set to: ${System.getProperty(rootPathProperty)}")
+        val pathStr = Option(System.getProperty(rootPathProperty))
+            .getOrElse(throw new IllegalArgumentException(s"System property '$rootPathProperty' must be set"))
+        JPaths.get(pathStr).toAbsolutePath
+    }
+
+    // Helper to resolve paths relative to the config file directory
+    private def resolvePathRelativeToRoot(pathStr: String): Path = {
+        val path = JPaths.get(pathStr)
+        if (path.isAbsolute) {
+            path
+        } else {
+            rootPath.resolve(path).normalize()
+        }
+    }
+    
+    // Config structure parsed from JSON
     private lazy val configFilePath: Path = {
         val pathStr = Option(System.getProperty(configFilePathProperty))
             .getOrElse(throw new IllegalArgumentException(s"System property '$configFilePathProperty' must be set"))
         JPaths.get(pathStr).toAbsolutePath
     }
-    private lazy val configDir: Path = configFilePath.getParent
     
     private lazy val config: Map[String, Any] = {
         val jsonString = new String(Files.readAllBytes(configFilePath))
@@ -57,16 +76,6 @@ class ConfigurableSiliconTests extends SilSuite {
                 parsed.map { case (k, v) => (k.toString, v) }
             case _ => 
                 throw new IllegalArgumentException(s"Invalid JSON configuration file: $configFilePath")
-        }
-    }
-
-    // Helper to resolve paths relative to the config file directory
-    private def resolvePathRelativeToConfig(pathStr: String): Path = {
-        val path = JPaths.get(pathStr)
-        if (path.isAbsolute) {
-            path
-        } else {
-            configDir.resolve(path).normalize()
         }
     }
 
@@ -79,17 +88,17 @@ class ConfigurableSiliconTests extends SilSuite {
 
     protected def warmupDirName: Option[String] = {
         val dir = config.getOrElse("warmupLocation", "").toString.trim
-        if (dir.isEmpty) None else Some(resolvePathRelativeToConfig(dir).toString)
+        if (dir.isEmpty) None else Some(resolvePathRelativeToRoot(dir).toString)
     }
 
     protected def targetDirName: String = 
         config.get("targetLocation") match {
-            case Some(name) => resolvePathRelativeToConfig(name.toString).toString
+            case Some(name) => resolvePathRelativeToRoot(name.toString).toString
             case None => fail("'targetLocation' not specified in config file")
         }
 
-    protected def csvFileName: Option[String] = getConfigStringOption("csvFile").map(resolvePathRelativeToConfig(_).toString)
-    protected def inclusionFileName: Option[String] = getConfigStringOption("inclusionFile").map(resolvePathRelativeToConfig(_).toString)
+    protected def csvFileName: Option[String] = getConfigStringOption("csvFile").map(resolvePathRelativeToRoot(_).toString)
+    protected def inclusionFileName: Option[String] = getConfigStringOption("inclusionFile").map(resolvePathRelativeToRoot(_).toString)
     protected def randomizeZ3: Boolean = config.getOrElse("randomizeZ3", Defaults.randomizeZ3).toString.toBoolean
     protected def timeout: Int = config.getOrElse("timeout", Defaults.timeout).toString.toDouble.toInt
 
