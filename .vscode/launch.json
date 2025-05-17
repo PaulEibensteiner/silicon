@@ -18,7 +18,8 @@
             "jvmOptions": [
                 "-Xss128m",
                 "-DSILICON_CONFIG_FILE=${input:siliconConfigFile}",
-                "-DSILICON_LOG_PATH=/home/paul/master-thesis/msc-peibensteine/tryout-results/SE-PC-check-temp/0-silicon.log"
+                "-DSILICON_LOG_PATH=/home/paul/master-thesis/msc-peibensteine/tryout-results/SE-PC-check-temp/0-silicon.log",
+                "-DROOT_DIR=${workspaceFolder}/.."
             ],
         },
         {
