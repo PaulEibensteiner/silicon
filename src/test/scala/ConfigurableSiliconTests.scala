@@ -32,7 +32,6 @@ class ConfigurableSiliconTests extends SilSuite {
         val targetLocation: Option[String] = None  // Required, no default
         val csvFile: Option[String] = None
         val inclusionFile: Option[String] = None
-        val randomizeZ3: Boolean = false
         val timeout: Int = 600
         val siliconArguments: Seq[String] = Seq(
             "--disableCatchingExceptions",
@@ -99,7 +98,6 @@ class ConfigurableSiliconTests extends SilSuite {
 
     protected def csvFileName: Option[String] = getConfigStringOption("csvFile").map(resolvePathRelativeToRoot(_).toString)
     protected def inclusionFileName: Option[String] = getConfigStringOption("inclusionFile").map(resolvePathRelativeToRoot(_).toString)
-    protected def randomizeZ3: Boolean = config.getOrElse("randomizeZ3", Defaults.randomizeZ3).toString.toBoolean
     protected def timeout: Int = config.getOrElse("timeout", Defaults.timeout).toString.toDouble.toInt
 
     private var csvFile: BufferedWriter = _
@@ -108,21 +106,10 @@ class ConfigurableSiliconTests extends SilSuite {
     // Silicon arguments constructed from config
     lazy val siliconArguments: Seq[String] = {
         // Get custom arguments from config, or use defaults
-        val baseArgs = config.get("siliconArguments") match {
+        config.get("siliconArguments") match {
             case Some(args: List[_]) => args.map(_.toString)
             case _ => Defaults.siliconArguments
         }
-        
-        // Add timeout argument
-        val timeoutArg = s"--timeout=$timeout"
-        
-        // Add randomization if configured
-        val allArgs = baseArgs :+ timeoutArg
-        if (randomizeZ3) allArgs :+ "--proverRandomizeSeeds" else allArgs
-    }
-
-    val randomization: Option[(Seq[String], String, Int => Int)] = {
-        Some(siliconArguments, "--proverSpecificRandomSeed", i => i)
     }
 
     // Verifier configuration
