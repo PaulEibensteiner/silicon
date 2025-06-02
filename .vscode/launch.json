@@ -30,9 +30,11 @@
             "buildTarget": "silicon",
             "args": [
                 "--ideModeAdvanced",
-                "--logConfig", "/home/paul/master-thesis/msc-peibensteine/backend-configs/silicon/minimal_logger_config.json",
+                "--enableTempDirectory",
+                "--tempDirectory=/home/paul/master-thesis/msc-peibensteine/tryout-results/logging-temp",
                 "${input:viperFile}"
             ],
+            "envFile": "${workspaceFolder}/../msc-peibensteine/.env"
         }
     ],
     "inputs": [

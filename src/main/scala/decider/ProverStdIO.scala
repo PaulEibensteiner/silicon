@@ -34,7 +34,6 @@ abstract class ProverStdIO(uniqueId: String,
 
   /* protected */ var pushPopScopeDepth = 0
   protected var lastTimeout: Int = -1
-  protected var logfileWriter: PrintWriter = _
   protected var prover: Process = _
   protected var proverShutdownHook: Thread = _
   protected var input: BufferedReader = _
@@ -84,7 +83,6 @@ abstract class ProverStdIO(uniqueId: String,
     }
     pushPopScopeDepth = 0
     lastTimeout = -1
-    logfileWriter = if (!Verifier.config.outputProverLog) null else viper.silver.utility.Common.PrintWriter(Verifier.config.proverLogFile(uniqueId).toFile)
     proverPath = getProverPath
     prover = createProverInstance()
     input = new BufferedReader(new InputStreamReader(prover.getInputStream))
@@ -145,19 +143,12 @@ abstract class ProverStdIO(uniqueId: String,
    */
   def stop(): Unit = {
     this.synchronized {
-      if (logfileWriter != null) {
-        logfileWriter.flush()
-      }
       if (output != null) {
         output.flush()
       }
       if (prover != null) {
         prover.destroyForcibly()
         prover.waitFor(10, TimeUnit.SECONDS) /* Makes the current thread wait until the process has been shut down */
-      }
-
-      if (logfileWriter != null) {
-        logfileWriter.close()
       }
       if (input != null) {
         input.close()
@@ -368,11 +359,7 @@ abstract class ProverStdIO(uniqueId: String,
   }
 
   def comment(str: String): Unit = {
-    val sanitisedStr =
-      str.replaceAll("\r", "")
-         .replaceAll("\n", "\n; ")
-
-    logToFile("; " + sanitisedStr)
+    // doesn't do anything, has to be cleaned up at some point
   }
 
   def fresh(name: String, argSorts: Seq[Sort], resultSort: Sort): Fun = {
@@ -475,14 +462,7 @@ abstract class ProverStdIO(uniqueId: String,
     result
   }
 
-  protected def logToFile(str: String): Unit = {
-    if (logfileWriter != null) {
-      logfileWriter.println(str)
-    }
-  }
-
   protected def writeLine(out: String): Unit = {
-    logToFile(out)
     output.println(out)
   }
 
