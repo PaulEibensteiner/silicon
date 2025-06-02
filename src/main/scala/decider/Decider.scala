@@ -20,6 +20,10 @@ import viper.silicon.state._
 import viper.silicon.state.terms._
 import viper.silicon.verifier.{Verifier, VerifierComponent}
 import viper.silver.reporter.{ConfigurationConfirmation, InternalWarningMessage}
+import spray.json._
+import DefaultJsonProtocol._
+import viper.silicon.logger.writer.SymbExLogReportWriter
+import viper.silicon.Map
 
 import scala.collection.immutable.HashSet
 import scala.collection.mutable
@@ -180,6 +184,19 @@ trait DefaultDeciderProvider extends VerifierComponent { this: Verifier =>
       createProver()
     }
 
+    protected def logStatistic(): Unit = {
+      this.synchronized {
+        val logfileWriter = if (!Verifier.config.outputProverLog) null else viper.silver.utility.Common.PrintWriter(Verifier.config.proverLogFile("").toFile)
+        if (logfileWriter == null) return
+
+        val mymap = prover.statistics()
+        logfileWriter.println(SymbExLogReportWriter.toJSON(mymap).compactPrint)
+        logfileWriter.flush()
+        logfileWriter.close()
+
+      }
+    }
+
     def reset(): Unit = {
       _prover.reset()
       pathConditions = new LayeredPathConditionStack()
@@ -201,6 +218,7 @@ trait DefaultDeciderProvider extends VerifierComponent { this: Verifier =>
       pathConditions.pushScope()
       _prover.push(timeout = Verifier.config.pushTimeout.toOption)
       //symbExLog.closeScope(sepIdentifier)
+      logStatistic()
     }
 
     def popScope(): Unit = {
@@ -209,6 +227,7 @@ trait DefaultDeciderProvider extends VerifierComponent { this: Verifier =>
       _prover.pop()
       pathConditions.popScope()
       //symbExLog.closeScope(sepIdentifier)
+      logStatistic()
     }
 
     def setCurrentBranchCondition(t: Term, te: Option[ast.Exp] = None): Unit = {
@@ -253,6 +272,7 @@ trait DefaultDeciderProvider extends VerifierComponent { this: Verifier =>
       terms foreach prover.assume
 
       symbExLog.closeScope(sepIdentifier)
+      logStatistic()
       None
     }
 
@@ -280,6 +300,8 @@ trait DefaultDeciderProvider extends VerifierComponent { this: Verifier =>
       else
         symbExLog.setSMTQuery(t)
 
+      
+      logStatistic()
       Q(success)
     }
 
@@ -291,6 +313,7 @@ trait DefaultDeciderProvider extends VerifierComponent { this: Verifier =>
       val result = asserted || proverAssert(t, timeout)
 
       symbExLog.closeScope(sepIdentifier)
+      logStatistic()
       result
     }
 
@@ -313,6 +336,7 @@ trait DefaultDeciderProvider extends VerifierComponent { this: Verifier =>
       }
 
       symbExLog.closeScope(sepIdentifier)
+      logStatistic()
 
       result
     }
