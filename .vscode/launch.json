@@ -6,15 +6,6 @@
             "request": "launch",
             "name": "Silicon Configurable Tests",
             "testClass": "viper.silicon.ConfigurableSiliconTests",
-            // "mainClass": "org.scalatest.tools.Runner",
-            //"env": {
-            //    "JAVA_TOOL_OPTIONS": "-DSILICON_CONFIG_FILE=${input:siliconConfigFile}"
-            //},
-            // "args": [
-            //     "-o",
-            //     "-s", "viper.silicon.ConfigurableSiliconTests"
-            // ],
-            // "buildTarget": "silicon",
             "jvmOptions": [
                 "-Xss128m",
                 "-DSILICON_CONFIG_FILE=${input:siliconConfigFile}",
@@ -29,10 +20,21 @@
             "mainClass": "viper.silicon.SiliconRunner",
             "buildTarget": "silicon",
             "args": [
-                "--ideModeAdvanced",
-                "--enableTempDirectory",
-                "--tempDirectory=/home/paul/master-thesis/msc-peibensteine/tryout-results/logging-temp",
-                "${input:viperFile}"
+                "--assumeInjectivityOnInhale",
+                "--useOldAxiomatization",
+                "--timeout=600",
+                "--disableCatchingExceptions",
+                "--numberOfParallelVerifiers=1",
+                "--numberOfErrorsToReport=0",
+                "--proverSaturationTimeout=156",
+                "--proverSaturationTimeoutWeights=[0.40,0.69,0.49,0.00,0.51]",
+                "--checkTimeout=9",
+                "--assertTimeout=3",
+                "--qpSplitTimeout=531",
+                "--prover=Z3-API",
+                "--maskHeapMode",
+                "--proverLogFile=/home/paul/master-thesis/msc-peibensteine/tryout-results/check-logging-.smt2",
+                "/home/paul/master-thesis/msc-peibensteine/tryout-targets/examples-11.1.vpr"
             ],
             "envFile": "${workspaceFolder}/../msc-peibensteine/.env"
         }
@@ -53,7 +55,7 @@
             "type": "command",
             "command": "extension.commandvariable.file.pickFile",
             "args": {
-                "include": "backend-configs/silicon/*.json",
+                "include": "${workspaceFolder}/../backend-configs/silicon/*.json",
                 "fromWorkspace": "msc-peibensteine",
                 "description": "Select the backend config file"
             }
