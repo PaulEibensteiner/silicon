@@ -237,7 +237,7 @@ class DefaultMainVerifier(config: Config,
       setErrorScope(results, predicate)
     })
 
-    decider.prover.stop()
+    // decider.prover.stop()
 
     _verificationPoolManager.pooledVerifiers.comment("-" * 60)
     _verificationPoolManager.pooledVerifiers.comment("Begin function- and predicate-related preamble")

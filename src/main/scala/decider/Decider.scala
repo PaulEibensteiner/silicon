@@ -181,19 +181,24 @@ trait DefaultDeciderProvider extends VerifierComponent { this: Verifier =>
     }
 
     protected def logStatistic(): Unit = {
-      this.synchronized {
-        val logfileWriter = if (!Verifier.config.outputProverLog) null else viper.silver.utility.Common.PrintWriter(Verifier.config.proverLogFile("").toFile)
-        if (logfileWriter == null) return
+      _prover.synchronized {
+        if (_prover != null) {
+          this.synchronized {
+            val logfileWriter = if (!Verifier.config.outputProverLog) null else viper.silver.utility.Common.PrintWriter(Verifier.config.proverLogFile("").toFile)
+            if (logfileWriter == null) return
 
-        val mymap = prover.statistics()
-        logfileWriter.println(SymbExLogReportWriter.toJSON(mymap).compactPrint)
-        logfileWriter.flush()
-        logfileWriter.close()
+            val mymap = prover.statistics()
+            logfileWriter.println(SymbExLogReportWriter.toJSON(mymap).compactPrint)
+            logfileWriter.flush()
+            logfileWriter.close()
 
+          }
+        }
       }
     }
 
     def reset(): Unit = {
+      logStatistic()
       _prover.reset()
       pathConditions = new LayeredPathConditionStack()
       _declaredFreshFunctions = if (Verifier.config.parallelizeBranches()) HashSet.empty else InsertionOrderedSet.empty /* [BRANCH-PARALLELISATION] */
@@ -203,6 +208,7 @@ trait DefaultDeciderProvider extends VerifierComponent { this: Verifier =>
     }
 
     def stop(): Unit = {
+      logStatistic()
       if (_prover != null) _prover.stop()
     }
 
