@@ -494,6 +494,12 @@ class Config(args: Seq[String]) extends SilFrontendConfig(args, "Silicon") {
     noshort = true
   )(singleArgConverter[ConfigValue[String]](s => UserValue(s)))
 
+  val proverStatisticsFile: ScallopOption[String] = opt[String]("proverStatisticsFile",
+    descr = "Log file containing statistics from the prover. Extension .json will be appended. If none given, no statistics are produced.",
+    default = None,
+    noshort = true
+  )(singleArgConverter[String](s => f"$s.json"))
+
   def getProverLogfile(suffix: String = "", rawLogFile: ConfigValue[String]): Path = {
     rawLogFile match {
       case UserValue(logfile) =>

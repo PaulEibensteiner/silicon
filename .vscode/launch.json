@@ -31,9 +31,7 @@
                 "--checkTimeout=9",
                 "--assertTimeout=3",
                 "--qpSplitTimeout=531",
-                "--prover=Z3-API",
-                "--maskHeapMode",
-                "--proverLogFile=/home/paul/master-thesis/msc-peibensteine/tryout-results/check-logging-.smt2",
+                "--proverStatisticsFile=/home/paul/master-thesis/msc-peibensteine/tryout-results/sil-statistics",
                 "/home/paul/master-thesis/msc-peibensteine/tryout-targets/examples-11.1.vpr"
             ],
             "envFile": "${workspaceFolder}/../msc-peibensteine/.env"
