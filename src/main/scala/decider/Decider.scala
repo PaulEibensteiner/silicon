@@ -187,15 +187,14 @@ trait DefaultDeciderProvider extends VerifierComponent { this: Verifier =>
     protected def logStatistic(): Unit = {
       _prover.synchronized {
         if (_prover != null) {
-          this.synchronized {
-            val logfileWriter = if (!Verifier.config.outputProverLog) null else viper.silver.utility.Common.PrintWriter(Verifier.config.proverLogFile("").toFile)
-            if (logfileWriter == null) return
-
+          Verifier.config.proverStatisticsFile.toOption.foreach { path =>
+            val logfileWriter = viper.silver.utility.Common
+                  .PrintWriter(new java.io.File(path))
             val mymap = prover.statistics()
             logfileWriter.println(SymbExLogReportWriter.toJSON(mymap).compactPrint)
             logfileWriter.flush()
             logfileWriter.close()
-
+            println("Wrote to " + path)
           }
         }
       }
