@@ -194,7 +194,6 @@ trait DefaultDeciderProvider extends VerifierComponent { this: Verifier =>
             logfileWriter.println(SymbExLogReportWriter.toJSON(mymap).compactPrint)
             logfileWriter.flush()
             logfileWriter.close()
-            println("Wrote to " + path)
           }
         }
       }
