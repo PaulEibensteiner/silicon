@@ -413,8 +413,8 @@ class DefaultMainVerifier(config: Config,
       preambleReader.emitPreamble(smt2ConfigOptions, sink, true)
     }
 
-    sink.comment("\n; /preamble.smt2")
-    preambleReader.emitPreamble("/preamble.smt2", sink, false)
+    sink.comment("\n; /preamble_setr.smt2")
+    preambleReader.emitPreamble("/preamble_setr.smt2", sink, false)
   }
 
   /* Prover preamble: After program analysis */

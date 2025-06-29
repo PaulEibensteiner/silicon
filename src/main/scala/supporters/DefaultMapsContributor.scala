@@ -17,7 +17,7 @@ class DefaultMapsContributor(val domainTranslator: DomainsTranslator[Term], conf
 
   val builtinDomainTypeTag: ClassTag[BuiltinDomainType] = classTag[ast.MapType]
 
-  override def defaultSourceResource: String = "/dafny_axioms/maps.vpr"
+  override def defaultSourceResource: String = "/dafny_axioms/maps_setr.vpr"
 
   override def userProvidedSourceFilepath: Option[String] = config.mapAxiomatizationFile.toOption
 
