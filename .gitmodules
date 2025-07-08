@@ -1,4 +1,4 @@
 [submodule "silver"]
 	path = silver
-	url = https://github.com/viperproject/silver.git
+	url = https://github.com/PaulEibensteiner/silver.git
 	branch = meilers_detailed_statistical_output_more_resetting
