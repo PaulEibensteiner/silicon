@@ -307,7 +307,7 @@ abstract class MemberSymbExLogger(log: SymbExLogger[_],
   /**
     * Most recent output of (get-info :all-statistics) from the underlying prover
     */
-  private var lastStatistics: Map[String, String] = Map.empty
+  protected var lastStatistics: Map[String, String] = Map.empty
 
   // Maps macros to their body
   private var _macros = Map[App, Term]()
