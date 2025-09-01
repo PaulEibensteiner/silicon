@@ -137,7 +137,7 @@ class Silicon(val reporter: Reporter, private var debugInfo: Seq[(String, Any)] 
     verifier.start()
   }
 
-  private def reset(): Unit = {
+  def reset(): Unit = {
     assert(lifetimeState == LifetimeState.Started || lifetimeState == LifetimeState.Running,
            "Silicon must be started before it can be reset")
 
