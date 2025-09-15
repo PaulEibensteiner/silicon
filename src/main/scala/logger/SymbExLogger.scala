@@ -25,6 +25,7 @@ import scala.annotation.elidable
 import scala.annotation.elidable._
 import scala.collection.immutable
 import scala.util.{Failure, Success, Try}
+import viper.silver.cfg.Block
 
 /**
   * ================================
@@ -374,8 +375,8 @@ abstract class MemberSymbExLogger(log: SymbExLogger[_],
     * @return id of the branching record
     */
   @elidable(INFO)
-  def insertBranchPoint(possibleBranchesCount: Int, condition: Option[Term] = None, conditionExp: Option[Exp] = None): Int = {
-    val branchingRecord = new BranchingRecord(possibleBranchesCount, condition, conditionExp)
+  def insertBranchPoint(possibleBranchesCount: Int, condition: Option[Term] = None, conditionExp: Option[Exp] = None, targetBlocks: Option[Seq[Block[ast.Stmt, ast.Exp]]] = None): Int = {
+    val branchingRecord = new BranchingRecord(possibleBranchesCount, condition, conditionExp, targetBlocks)
     branchingRecord.id = log.freshUid()
     whenOpen { appendBranchingRecord(branchingRecord) }
     branchingRecord.id
@@ -494,7 +495,7 @@ case object NoopMemberSymbExLog extends MemberSymbExLogger(null, null, null) {
 
   override def openMemberScope(): Unit = {}
   override def openScope(s: DataRecord): Int = 0
-  override def insertBranchPoint(possibleBranchesCount: Int, condition: Option[Term] = None, conditionExp: Option[Exp] = None): Int = 0
+  override def insertBranchPoint(possibleBranchesCount: Int, condition: Option[Term] = None, conditionExp: Option[Exp] = None, targetBlocks: Option[Seq[Block[ast.Stmt, ast.Exp]]] = None): Int = 0
   override def markReachable(uidBranchPoint: Int): Unit = {}
   override def closeScope(n: Int): Unit = {}
   override def closeMemberScope(): Unit = {}

@@ -17,13 +17,15 @@ import viper.silicon.verifier.Verifier
 import viper.silver.ast
 import viper.silver.reporter.{BranchFailureMessage}
 import viper.silver.verifier.Failure
+import viper.silver.cfg.Block
 
 trait BranchingRules extends SymbolicExecutionRules {
   def branch(s: State,
              condition: Term,
              conditionExp: Option[ast.Exp],
              v: Verifier,
-             fromShortCircuitingAnd: Boolean = false)
+             fromShortCircuitingAnd: Boolean = false,
+             targetBlocks: Option[Seq[Block[ast.Stmt, ast.Exp]]] = None)
             (fTrue: (State, Verifier) => VerificationResult,
              fFalse: (State, Verifier) => VerificationResult)
             : VerificationResult
@@ -34,7 +36,8 @@ object brancher extends BranchingRules {
              condition: Term,
              conditionExp: Option[ast.Exp],
              v: Verifier,
-             fromShortCircuitingAnd: Boolean = false)
+             fromShortCircuitingAnd: Boolean = false,
+             targetBlocks: Option[Seq[Block[ast.Stmt, ast.Exp]]] = None)
             (fThen: (State, Verifier) => VerificationResult,
              fElse: (State, Verifier) => VerificationResult)
             : VerificationResult = {
@@ -82,7 +85,7 @@ object brancher extends BranchingRules {
 
     var elseBranchVerifier: String = null
 
-    val uidBranchPoint = v.symbExLog.insertBranchPoint(2, Some(condition), conditionExp)
+    val uidBranchPoint = v.symbExLog.insertBranchPoint(2, Some(condition), conditionExp, targetBlocks)
     var functionsOfCurrentDecider: Set[FunctionDecl] = null
     var macrosOfCurrentDecider: Vector[MacroDecl] = null
     var wasElseExecutedOnDifferentVerifier = false
