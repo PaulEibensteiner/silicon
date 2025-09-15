@@ -67,7 +67,7 @@ object executor extends ExecutionRules {
             /* Using branch(...) here ensures that the edge condition is recorded
              * as a branch condition on the pathcondition stack.
              */
-            brancher.branch(s2.copy(parallelizeBranches = false), tCond, Some(ce.condition), v1)(
+            brancher.branch(s2.copy(parallelizeBranches = false), tCond, Some(ce.condition), v1, targetBlocks = Some(Seq(ce.target)))(
               (s3, v3) =>
                 exec(s3.copy(parallelizeBranches = s2.parallelizeBranches), ce.target, ce.kind, v3, joinPoint)((s4, v4) => {
                   v4.symbExLog.closeScope(sepIdentifier)
@@ -138,7 +138,7 @@ object executor extends ExecutionRules {
         eval(s, cedge1.condition, pvef(cedge1.condition), v)((s1, t0, v1) =>
           // The type arguments here are Null because there is no need to pass any join data.
           joiner.join[scala.Null, scala.Null](s1, v1, resetState = false)((s2, v2, QB) => {
-            brancher.branch(s2, t0, Some(cedge1.condition), v2)(
+            brancher.branch(s2, t0, Some(cedge1.condition), v2, targetBlocks = Some(Seq(edge1.target, edge2.target)))(
               // Follow only until join point.
               (s3, v3) => follow(s3, edge1, v3, Some(newJoinPoint))((s, v) => QB(s, null, v)),
               (s3, v3) => follow(s3, edge2, v3, Some(newJoinPoint))((s, v) => QB(s, null, v))
@@ -168,7 +168,7 @@ object executor extends ExecutionRules {
         val condEdgeRecord = new ConditionalEdgeRecord(thenEdge.condition, s, v.decider.pcs)
         val sepIdentifier = v.symbExLog.openScope(condEdgeRecord)
         val res = eval(s, thenEdge.condition, IfFailed(thenEdge.condition), v)((s2, tCond, v1) =>
-          brancher.branch(s2, tCond, Some(thenEdge.condition), v1)(
+          brancher.branch(s2, tCond, Some(thenEdge.condition), v1, targetBlocks = Some(Seq(thenEdge.target, elseEdge.target)))(
             (s3, v3) => {
               follow(s3, thenEdge, v3, joinPoint)(Q)
             },

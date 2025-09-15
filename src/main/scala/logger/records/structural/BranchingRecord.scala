@@ -9,10 +9,28 @@ package viper.silicon.logger.records.structural
 import viper.silicon.logger.records.SymbolicRecord
 import viper.silicon.state.terms.Term
 import viper.silver.ast.Exp
+import viper.silver.cfg.Block
+import viper.silver.ast
 
-class BranchingRecord(possibleBranchesCount: Int, val condition: Option[Term], val conditionExp: Option[Exp]) extends StructuralRecord {
+class BranchingRecord(possibleBranchesCount: Int, val condition: Option[Term], val conditionExp: Option[Exp], val targetBlocks: Option[Seq[Block[ast.Stmt, ast.Exp]]]) extends StructuralRecord {
   private var currentBranchIndex = 0
   private val branches: Vector[BranchInfo] = Vector.tabulate(possibleBranchesCount)(_ => new BranchInfo())
+
+  def getCurrentTargetBlockPosition(): Option[(ast.Position, ast.Position)] = {
+    targetBlocks match {
+      case Some(blocks) if currentBranchIndex < blocks.length => Some(
+        blocks(currentBranchIndex).elements(0).merge.pos match {
+          case pos: ast.AbstractSourcePosition => pos.start
+          case pos => pos
+        },
+        blocks(currentBranchIndex).elements.last.merge.pos match {
+          case pos: ast.AbstractSourcePosition => pos.end.getOrElse(pos.start)
+          case pos => pos
+        }
+      )
+      case _ => None
+    }
+  }
 
   def getCurrentBranch: BranchInfo = {
     assert(0 <= currentBranchIndex && currentBranchIndex < branches.length)
