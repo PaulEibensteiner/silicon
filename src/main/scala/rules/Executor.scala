@@ -373,7 +373,7 @@ object executor extends ExecutionRules {
             val resChunk = s.h.values.find(c => c.asInstanceOf[MaskHeapChunk].resource == field).get.asInstanceOf[BasicMaskHeapChunk]
             val ve = pve dueTo InsufficientPermission(fa)
             val maskValue = HeapLookup(resChunk.mask, tRcvr)
-            v2.decider.assert(AtLeast(maskValue, FullPerm)) {
+            v2.decider.assert(AtLeast(maskValue, FullPerm), expr = Some(eRcvr)) {
               case true =>
                 val heapUpdated = HeapUpdate(resChunk.heap, tRcvr, tRhs, s2, v2.decider)
                 val newChunk = resChunk.copy(heap = heapUpdated)

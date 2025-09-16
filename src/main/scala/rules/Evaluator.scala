@@ -197,7 +197,7 @@ object evaluator extends EvaluationRules {
           val resChunk = s.h.values.find(c => c.asInstanceOf[MaskHeapChunk].resource == fa.field).get.asInstanceOf[BasicMaskHeapChunk]
           val ve = pve dueTo InsufficientPermission(fa)
           val maskValue = HeapLookup(resChunk.mask, tRcvr)
-          v1.decider.assert(perms.IsPositive(maskValue)){
+          v1.decider.assert(perms.IsPositive(maskValue), expr = Some(fa.rcv)){
             case true =>
               val heapValue = HeapLookup(resChunk.heap, tRcvr)
               val tSnap = heapValue.convert(sorts.Snap)
@@ -214,7 +214,7 @@ object evaluator extends EvaluationRules {
           val resChunk = s.h.values.find(c => c.asInstanceOf[MaskHeapChunk].resource == pa.res(s.program)).get.asInstanceOf[BasicMaskHeapChunk]
           val ve = pve dueTo InsufficientPermission(pa)
           val maskValue = HeapLookup(resChunk.mask, toSnapTree(tArgs))
-          v1.decider.assert(perms.IsPositive(maskValue)) {
+          v1.decider.assert(perms.IsPositive(maskValue), expr = Some(e)) {
             case true =>
               val heapValue = HeapLookup(resChunk.heap, toSnapTree(tArgs))
               val tSnap = heapValue.convert(sorts.Snap)
@@ -250,7 +250,7 @@ object evaluator extends EvaluationRules {
                 val s2 = s1.copy(functionRecorder = fr1)
                 Q(s2, fvfLookup, v1)
               } else {
-                v1.decider.assert(IsPositive(totalPermissions.replace(`?r`, tRcvr))) {
+                v1.decider.assert(IsPositive(totalPermissions.replace(`?r`, tRcvr)), expr = Some(e)) {
                   case false =>
                     createFailure(pve dueTo InsufficientPermission(fa), v1, s1)
                   case true =>
@@ -284,7 +284,7 @@ object evaluator extends EvaluationRules {
                   val totalPermissions = PermLookup(fa.field.name, pmDef1.pm, tRcvr)
                   IsPositive(totalPermissions)
                 }
-              v1.decider.assert(permCheck) {
+              v1.decider.assert(permCheck, expr = Some(e)) {
                 case false =>
                   createFailure(pve dueTo InsufficientPermission(fa), v1, s1)
                 case true =>
@@ -867,7 +867,7 @@ object evaluator extends EvaluationRules {
         if (s.cycles(predicate) < Verifier.config.recursivePredicateUnfoldings()) {
           evals(s, eArgs, _ => pve, v)((s1, tArgs, v1) =>
             eval(s1, ePerm, pve, v1)((s2, tPerm, v2) =>
-              v2.decider.assert(IsPositive(tPerm)) {
+              v2.decider.assert(IsPositive(tPerm), expr = Some(e)) {
                 case true =>
                   joiner.join[Term, Term](s2, v2)((s3, v3, QB) => {
                     val s4 = s3.incCycleCounter(predicate)
@@ -944,9 +944,9 @@ object evaluator extends EvaluationRules {
           if (s1.triggerExp) {
             Q(s1, SeqAt(t0, t1), v1)
           } else {
-            v1.decider.assert(AtLeast(t1, IntLiteral(0))) {
+            v1.decider.assert(AtLeast(t1, IntLiteral(0)), expr = Some(e)) {
               case true =>
-                v1.decider.assert(Less(t1, SeqLength(t0))) {
+                v1.decider.assert(Less(t1, SeqLength(t0)), expr = Some(e)) {
                   case true =>
                     Q(s1, SeqAt(t0, t1), v1)
                   case false =>
@@ -959,7 +959,7 @@ object evaluator extends EvaluationRules {
                 val failure1 = createFailure(pve dueTo SeqIndexNegative(e0, e1), v1, s1)
                 if (s1.retryLevel == 0 && v1.reportFurtherErrors()) {
                   v1.decider.assume(AtLeast(t1, IntLiteral(0)))
-                  v1.decider.assert(Less(t1, SeqLength(t0))) {
+                  v1.decider.assert(Less(t1, SeqLength(t0)), expr = Some(e)) {
                     case true =>
                       failure1 combine Q(s1, SeqAt(t0, t1), v1)
                     case false =>
@@ -982,9 +982,9 @@ object evaluator extends EvaluationRules {
           if (s1.triggerExp) {
             Q(s1, SeqUpdate(t0, t1, t2), v1)
           } else {
-            v1.decider.assert(AtLeast(t1, IntLiteral(0))) {
+            v1.decider.assert(AtLeast(t1, IntLiteral(0)), expr = Some(e)) {
               case true =>
-                v1.decider.assert(Less(t1, SeqLength(t0))) {
+                v1.decider.assert(Less(t1, SeqLength(t0)), expr = Some(e)) {
                   case true =>
                     Q(s1, SeqUpdate(t0, t1, t2), v1)
                   case false =>
@@ -997,7 +997,7 @@ object evaluator extends EvaluationRules {
                 val failure1 = createFailure(pve dueTo SeqIndexNegative(e0, e1), v1, s1)
                 if (s1.retryLevel == 0 && v1.reportFurtherErrors()) {
                   v1.decider.assume(AtLeast(t1, IntLiteral(0)))
-                  v1.decider.assert(Less(t1, SeqLength(t0))) {
+                  v1.decider.assert(Less(t1, SeqLength(t0)), expr = Some(e)) {
                     case true =>
                       failure1 combine Q(s1, SeqUpdate(t0, t1, t2), v1)
                     case false =>
@@ -1093,7 +1093,7 @@ object evaluator extends EvaluationRules {
       case ast.MapLookup(base, key) =>
         evals2(s, Seq(base, key), Nil, _ => pve, v)({
           case (s1, Seq(baseT, keyT), v1) if s1.triggerExp => Q(s1, MapLookup(baseT, keyT), v1)
-          case (s1, Seq(baseT, keyT), v1) => v1.decider.assert(SetIn(keyT, MapDomain(baseT))) {
+          case (s1, Seq(baseT, keyT), v1) => v1.decider.assert(SetIn(keyT, MapDomain(baseT)), expr = Some(e)) {
             case true => Q(s1, MapLookup(baseT, keyT), v1)
             case false =>
               val failure1 = createFailure(pve dueTo MapKeyNotContained(base, key), v1, s1)
@@ -1308,7 +1308,7 @@ object evaluator extends EvaluationRules {
                              (Q: (State, Term, Verifier) => VerificationResult)
                              : VerificationResult = {
 
-    v.decider.assert(tDivisor !== tZero){
+    v.decider.assert(tDivisor !== tZero, expr = Some(eDivisor)){
       case true => Q(s, t, v)
       case false =>
         val failure = createFailure(pve dueTo DivisionByZero(eDivisor), v, s)
