@@ -55,7 +55,7 @@ trait Decider {
    *         1. It passes State and Operations to the continuation
    *         2. The implementation reacts to a failing assertion by e.g. a state consolidation
    */
-  def assert(t: Term, timeout: Option[Int] = None)(Q:  Boolean => VerificationResult): VerificationResult
+  def assert(t: Term, timeout: Option[Int] = None, expr: Option[ast.Exp] = None)(Q:  Boolean => VerificationResult): VerificationResult
 
   def fresh(id: String, sort: Sort): Var
   def fresh(id: String, argSorts: Seq[Sort], resultSort: Sort): Function
@@ -286,11 +286,11 @@ trait DefaultDeciderProvider extends VerifierComponent { this: Verifier =>
 
     def check(t: Term, timeout: Int): Boolean = deciderAssert(t, Some(timeout))
 
-    def assert(t: Term, timeout: Option[Int] = Verifier.config.assertTimeout.toOption)
+    def assert(t: Term, timeout: Option[Int] = Verifier.config.assertTimeout.toOption, expr: Option[ast.Exp] = None)
               (Q: Boolean => VerificationResult)
               : VerificationResult = {
 
-      val success = deciderAssert(t, timeout)
+      val success = deciderAssert(t, timeout, expr)
 
       // If the SMT query was not successful, store it (possibly "overwriting"
       // any previously saved query), otherwise discard any query we had saved
@@ -306,8 +306,8 @@ trait DefaultDeciderProvider extends VerifierComponent { this: Verifier =>
       Q(success)
     }
 
-    private def deciderAssert(t: Term, timeout: Option[Int]) = {
-      val assertRecord = new DeciderAssertRecord(t, timeout)
+    private def deciderAssert(t: Term, timeout: Option[Int], expr: Option[ast.Exp] = None) = {
+      val assertRecord = new DeciderAssertRecord(t, timeout, expr)
       val sepIdentifier = symbExLog.openScope(assertRecord)
 
       val asserted = isKnownToBeTrue(t)

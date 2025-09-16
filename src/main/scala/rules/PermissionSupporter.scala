@@ -23,7 +23,7 @@ object permissionSupporter extends SymbolicExecutionRules {
       case k: Var if s.constrainableARPs.contains(k) =>
         Q(s, v)
       case _ =>
-        v.decider.assert(perms.IsNonNegative(tPerm)) {
+        v.decider.assert(perms.IsNonNegative(tPerm), expr = Some(ePerm)) {
           case true => Q(s, v)
           case false => createFailure(pve dueTo NegativePermission(ePerm), v, s)
         }
@@ -38,7 +38,7 @@ object permissionSupporter extends SymbolicExecutionRules {
       case k: Var if s.constrainableARPs.contains(k) =>
         Q(s, v)
       case _ =>
-        v.decider.assert(perms.IsPositive(tPerm)) {
+        v.decider.assert(perms.IsPositive(tPerm), expr = Some(ePerm)) {
           case true => Q(s, v)
           case false => createFailure(pve dueTo NonPositivePermission(ePerm), v, s)
         }

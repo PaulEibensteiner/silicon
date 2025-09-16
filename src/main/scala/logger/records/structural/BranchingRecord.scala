@@ -37,6 +37,8 @@ class BranchingRecord(possibleBranchesCount: Int, val condition: Option[Term], v
     branches(currentBranchIndex)
   }
 
+  def getCurrentBranchIndex: Int = currentBranchIndex
+
   def appendLog(r: SymbolicRecord): Unit =
     getCurrentBranch.records :+= r
 
