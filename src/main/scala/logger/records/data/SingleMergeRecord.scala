@@ -17,7 +17,6 @@ class SingleMergeRecord(val destChunks: Seq[NonQuantifiedChunk],
                         val newChunks: Seq[NonQuantifiedChunk],
                         p: PathConditionStack) extends DataRecord {
   val value: ast.Node = null
-  val state: State = null
   val pcs: InsertionOrderedSet[Term] = if (p != null) p.assumptions else null
 
   override val toTypeString: String = "single merge"

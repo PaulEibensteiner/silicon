@@ -16,7 +16,6 @@ import viper.silver.ast
 
 class ProverAssertRecord(val term: Term, val timeout: Option[Int]) extends DataRecord {
   val value: ast.Node = null
-  val state: State = null
   val pcs: InsertionOrderedSet[Term] = null
   var statistics: Option[Map[String, String]] = None
 

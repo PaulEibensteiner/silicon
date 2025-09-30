@@ -24,11 +24,14 @@ import viper.silver.verifier.Model
 // import viper.silver.testing.BenchmarkStatCollector
 
 import scala.collection.mutable
+import viper.silicon.logger.MemberSymbExLogger
+import viper.silicon.logger.records.data.CommentRecord
 
 abstract class ProverStdIO(uniqueId: String,
                     termConverter: TermToSMTLib2Converter,
                     identifierFactory: IdentifierFactory,
-                    reporter: Reporter)
+                    reporter: Reporter,
+                    symbExLogger: MemberSymbExLogger)
     extends Prover
        with LazyLogging {
 
@@ -248,7 +251,9 @@ abstract class ProverStdIO(uniqueId: String,
     readSuccess()
 
     val startTime = System.currentTimeMillis()
+    val id = symbExLogger.openScope(new CommentRecord("smt scope", null, null))
     writeLine("(check-sat)")
+    symbExLogger.closeScope(id)
     val result = readUnsat()
     val endTime = System.currentTimeMillis()
 
@@ -272,7 +277,9 @@ abstract class ProverStdIO(uniqueId: String,
   def saturate(timeout: Int, comment: String): Unit = {
     this.comment(s"State saturation: $comment")
     setTimeout(Some(timeout))
+    val id = symbExLogger.openScope(new CommentRecord("smt scope", null, null))
     writeLine("(check-sat)")
+    symbExLogger.closeScope(id)
     readLine()
   }
 
@@ -316,7 +323,9 @@ abstract class ProverStdIO(uniqueId: String,
     readSuccess()
 
     val startTime = System.currentTimeMillis()
+    val id = symbExLogger.openScope(new CommentRecord("smt scope", null, null))
     writeLine(s"(check-sat $guardApp)")
+    symbExLogger.closeScope(id)
     val result = readUnsat()
     val endTime = System.currentTimeMillis()
 
@@ -329,9 +338,9 @@ abstract class ProverStdIO(uniqueId: String,
 
   def check(timeout: Option[Int] = None): Result = {
     setTimeout(timeout)
-
+    val id = symbExLogger.openScope(new CommentRecord("smt scope", null, null))
     writeLine("(check-sat)")
-
+    symbExLogger.closeScope(id)
     readLine() match {
       case "sat" => Sat
       case "unsat" => Unsat

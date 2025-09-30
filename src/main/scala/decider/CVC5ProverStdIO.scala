@@ -12,6 +12,7 @@ import viper.silicon.verifier.Verifier
 import viper.silver.verifier.{DefaultDependency => SilDefaultDependency}
 import viper.silver.reporter.Reporter
 import viper.silicon.common.config.Version
+import viper.silicon.logger.MemberSymbExLogger
 
 object Cvc5ProverStdIO {
   val name = "cvc5"
@@ -27,8 +28,9 @@ object Cvc5ProverStdIO {
 class Cvc5ProverStdIO(uniqueId: String,
                       termConverter: TermToSMTLib2Converter,
                       identifierFactory: IdentifierFactory,
-                      reporter: Reporter)
-    extends ProverStdIO(uniqueId, termConverter, identifierFactory, reporter) {
+                      reporter: Reporter,
+                    symbExLogger: MemberSymbExLogger)
+    extends ProverStdIO(uniqueId, termConverter, identifierFactory, reporter, symbExLogger) {
     
   val name: String = Cvc5ProverStdIO.name
   val minVersion: Version = Cvc5ProverStdIO.minVersion

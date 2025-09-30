@@ -24,6 +24,8 @@ import viper.silicon.reporting.ExternalToolError
 
 import scala.jdk.CollectionConverters.MapHasAsJava
 import scala.util.Random
+import viper.silicon.logger.MemberSymbExLogger
+import viper.silicon.logger.records.data.CommentRecord
 
 
 object Z3ProverAPI {
@@ -69,7 +71,8 @@ class Z3ProverAPI(uniqueId: String,
                   termConverter: TermToZ3APIConverter,
                   identifierFactory: IdentifierFactory,
                   reporter: Reporter,
-                  triggerGenerator: TriggerGenerator)
+                  triggerGenerator: TriggerGenerator,
+                  symbExLogger: MemberSymbExLogger)
     extends Prover
       with LazyLogging
 {
@@ -296,7 +299,9 @@ class Z3ProverAPI(uniqueId: String,
     val negatedGoal = ctx.mkNot(termConverter.convert(goal).asInstanceOf[BoolExpr])
     prover.add(negatedGoal)
     val startTime = System.currentTimeMillis()
+    val id = symbExLogger.openScope(new CommentRecord("smt scope", null, null))
     val res = prover.check()
+    symbExLogger.closeScope(id)
     val endTime = System.currentTimeMillis()
     val result = res == Status.UNSATISFIABLE
     pop()
@@ -320,7 +325,9 @@ class Z3ProverAPI(uniqueId: String,
   def saturate(timeout: Int, comment: String): Unit = {
     endPreamblePhase()
     setTimeout(Some(timeout))
+    val id = symbExLogger.openScope(new CommentRecord("smt scope", null, null))
     prover.check()
+    symbExLogger.closeScope(id)
   }
 
   protected def retrieveAndSaveModel(): Unit = {
@@ -352,7 +359,9 @@ class Z3ProverAPI(uniqueId: String,
     prover.add(termConverter.convertTerm(goalImplication).asInstanceOf[BoolExpr])
 
     val startTime = System.currentTimeMillis()
-    val res = prover.check(termConverter.convertTerm(guardApp))
+    val id = symbExLogger.openScope(new CommentRecord("smt scope", null, null))
+    val res = prover.check(termConverter.convertTerm(guardApp).asInstanceOf[BoolExpr])
+    symbExLogger.closeScope(id)
     val endTime = System.currentTimeMillis()
     val result = res == Status.UNSATISFIABLE
     if (!result) {
@@ -365,8 +374,9 @@ class Z3ProverAPI(uniqueId: String,
   def check(timeout: Option[Int] = None): Result = {
     endPreamblePhase()
     setTimeout(timeout)
-
+    val id = symbExLogger.openScope(new CommentRecord("smt scope", null, null))
     val res = prover.check()
+    symbExLogger.closeScope(id)
 
     res match {
       case Status.SATISFIABLE => Sat
@@ -397,7 +407,7 @@ class Z3ProverAPI(uniqueId: String,
     val statistics = prover.getStatistics
     val result = mutable.HashMap[String, String]()
     for (e <- statistics.getEntries()) {
-      result.update(e.Key, e.getValueString)
+      result.update(e.Key.replace(" ", "-"), e.getValueString)
     }
     Map.from(result)
   }

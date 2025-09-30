@@ -12,7 +12,7 @@ import viper.silicon.state._
 import viper.silicon.state.terms.Term
 import viper.silver.ast
 
-class CommentRecord(str: String, s: State, p: PathConditionStack) extends DataRecord {
+class CommentRecord(str: String, s: State, p: PathConditionStack) extends DataRecord with Stateful {
   val value: ast.Node = null
   val state: State = s
   val pcs: InsertionOrderedSet[Term] = if (p != null) p.assumptions else null

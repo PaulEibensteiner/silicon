@@ -12,7 +12,7 @@ import viper.silicon.state.State
 import viper.silicon.state.terms.Term
 import viper.silver.ast
 
-class ExecuteRecord(v: ast.Stmt, s: State, p: PathConditionStack) extends DataRecord {
+class ExecuteRecord(v: ast.Stmt, s: State, p: PathConditionStack) extends DataRecord with Stateful {
   val value: ast.Stmt = v
   val state: State = s
   val pcs: InsertionOrderedSet[Term] = if (p != null) p.assumptions else null
