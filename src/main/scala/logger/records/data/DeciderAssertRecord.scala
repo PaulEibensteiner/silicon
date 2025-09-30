@@ -13,7 +13,6 @@ import viper.silver.ast
 
 class DeciderAssertRecord(val term: Term, val timeout: Option[Int], val expr: Option[ast.Exp] = None) extends DataRecord {
   val value: ast.Node = null
-  val state: State = null
   val pcs: InsertionOrderedSet[Term] = null
 
   override val toTypeString: String = "decider assert"

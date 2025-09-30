@@ -426,6 +426,15 @@ sealed trait Term extends Node {
       case other => Vector(other)
     }
   }
+
+  lazy val quantifierCount: Int = {
+    val self = this match { case _: Quantification => 1; case _ => 0 }
+    self + subterms.view.map(_.quantifierCount).sum
+  }
+
+  lazy val length: Int = {
+    1 + subterms.view.map(_.length).sum
+  }
 }
 
 trait UnaryOp[E] {
