@@ -16,6 +16,17 @@
         {
             "type": "scala",
             "request": "launch",
+            "name": "Silicon SplitMethods ",
+            "testClass": "SplitMethods",
+            "jvmOptions": [
+                "-Xss128m",
+                "-Dpretty.input.dir=src/test/resources",
+                "-Dpretty.output.dir=src/test/resources-methods",
+            ],
+        },
+        {
+            "type": "scala",
+            "request": "launch",
             "name": "Silicon Run",
             "mainClass": "viper.silicon.SiliconRunner",
             "buildTarget": "silicon",
