@@ -12,8 +12,7 @@ import viper.silver.ast.pretty.FastPrettyPrinter._
 import tests.instantiateFrontend
 import viper.silver.ast._
 
-
-
+// A significant amount of code in this file was created by generative artificial intelligence.
 
 /**
   * Behaviour:
